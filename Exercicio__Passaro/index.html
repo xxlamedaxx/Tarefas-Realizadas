@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <title>Exercício do Pássaro</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;  }
+    </style>
+
+    <style>
+        h1 { 
+    position: absolute;
+    top: 20px;  /* Ajuste a altura conforme necessário */
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 36px; /* Ajuste o tamanho da fonte */
+    color: white; /* Para garantir visibilidade sobre a imagem */
+    z-index: 10; /* Mantém o título acima do jogo */
+}
+
+    </style>
+</head>
+<body>
+    <h1> 👑 Passaro Rei 👑</h1>
+<script>
+      var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var game = new Phaser.Game(config);
+
+    var passaro;
+    var passarinho;
+
+    function preload() {
+        this.load.image('bg', 'assets/ceu.png');
+        this.load.spritesheet("fly", "assets/bird-red.png", { frameWidth: 75, frameHeight: 75 });
+        this.load.spritesheet("item", "assets/bird-purple.png", { frameWidth: 75, frameHeight: 75 });
+    }
+
+    function create() {
+        this.add.image(400, 300, 'bg').setScale(1.8);
+
+        // Criando o passaro (movimento horizontal)
+        passaro = this.add.sprite(100, 300, 'fly').setScale(1.3);
+        passaro.ida = true; // Inicializando a direção
+
+        // Criando o passarinho (movimento vertical)
+        passarinho = this.add.sprite(400, 200, "item").setScale(1.3);
+        passarinho.subindo = false; // Inicializando a direção
+
+        // Animação do pássaro vermelho
+        this.anims.create({
+            key: 'fly',
+            frames: this.anims.generateFrameNumbers('fly', { start: 0, end: 7 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        passaro.anims.play('fly', true);
+
+        // Animação do passarinho roxo
+        this.anims.create({
+            key: "item",
+            frames: this.anims.generateFrameNumbers("item", { start: 0, end: 7 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        passarinho.anims.play("item", true);
+    }
+
+    function update() {
+        // 🚀 Movimento horizontal (esquerda <-> direita)
+        if (passaro.x === 100) {
+            passaro.setFlip(false, false);
+            passaro.ida = true;
+        }
+
+        if (passaro.x < 700 && passaro.ida === true) {
+            passaro.x += 5;
+        }
+
+        if (passaro.x === 700) {
+            passaro.setFlip(true, false);
+            passaro.ida = false;
+        }
+
+        if (passaro.x > 100 && passaro.ida === false) {
+            passaro.x -= 5;
+        }
+
+        // 🚀 Movimento vertical (cima <-> baixo)
+        if (passarinho.y <= 200) {
+            passarinho.subindo = false; // Quando chega no topo, começa a descer
+        }
+
+        if (passarinho.y >= 400) {
+            passarinho.subindo = true; // Quando chega no fundo, começa a subir
+        }
+
+        if (passarinho.subindo) {
+            passarinho.y -= 3; // Move para cima
+        } else {
+            passarinho.y += 3; // Move para baixo
+        }
+    }
+
+
+
+</script>
+
+</body>
+</html>
+
