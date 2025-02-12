@@ -18,13 +18,13 @@
     <style>
         h1 { 
     position: absolute;
-    top: 20px;  /* Ajuste a altura conforme necessário */
+    top: 20px;  /* Ajuste  altura */
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
-    font-size: 36px; /* Ajuste o tamanho da fonte */
-    color: white; /* Para garantir visibilidade sobre a imagem */
-    z-index: 10; /* Mantém o título acima do jogo */
+    font-size: 36px; /* Ajuste fonte */
+    color: white; /* visibilidade da imagem */
+    z-index: 10; /* título acima do jogo */
 }
 
     </style>
@@ -47,12 +47,11 @@
     var game = new Phaser.Game(config);
 
     var passaro;
-    var passarinho;
 
     function preload() {
         this.load.image('bg', 'assets/ceu.png');
         this.load.spritesheet("fly", "assets/bird-red.png", { frameWidth: 75, frameHeight: 75 });
-        this.load.spritesheet("item", "assets/bird-purple.png", { frameWidth: 75, frameHeight: 75 });
+        
     }
 
     function create() {
@@ -60,13 +59,9 @@
 
         // Criando o passaro (movimento horizontal)
         passaro = this.add.sprite(100, 300, 'fly').setScale(1.3);
-        passaro.ida = true; // Inicializando a direção
-
-        // Criando o passarinho (movimento vertical)
-        passarinho = this.add.sprite(400, 200, "item").setScale(1.3);
-        passarinho.subindo = false; // Inicializando a direção
-
-        // Animação do pássaro vermelho
+        passaro.ida = true; // direção
+        
+        // Animação do pássaro
         this.anims.create({
             key: 'fly',
             frames: this.anims.generateFrameNumbers('fly', { start: 0, end: 7 }),
@@ -75,51 +70,41 @@
         });
         passaro.anims.play('fly', true);
 
-        // Animação do passarinho roxo
-        this.anims.create({
-            key: "item",
-            frames: this.anims.generateFrameNumbers("item", { start: 0, end: 7 }),
-            frameRate: 10,
-            repeat: -1
-        });
-        passarinho.anims.play("item", true);
     }
 
     function update() {
-        // 🚀 Movimento horizontal (esquerda <-> direita)
-        if (passaro.x === 100) {
-            passaro.setFlip(false, false);
-            passaro.ida = true;
-        }
-
-        if (passaro.x < 700 && passaro.ida === true) {
-            passaro.x += 5;
-        }
-
-        if (passaro.x === 700) {
-            passaro.setFlip(true, false);
-            passaro.ida = false;
-        }
-
-        if (passaro.x > 100 && passaro.ida === false) {
-            passaro.x -= 5;
-        }
-
-        // 🚀 Movimento vertical (cima <-> baixo)
-        if (passarinho.y <= 200) {
-            passarinho.subindo = false; // Quando chega no topo, começa a descer
-        }
-
-        if (passarinho.y >= 400) {
-            passarinho.subindo = true; // Quando chega no fundo, começa a subir
-        }
-
-        if (passarinho.subindo) {
-            passarinho.y -= 3; // Move para cima
-        } else {
-            passarinho.y += 3; // Move para baixo
-        }
+    // M horizontal e vertical diagonal
+    if (passaro.x === 100) {
+        passaro.setFlip(false, false);
+        passaro.ida = true;
     }
+
+    if (passaro.x >= 700) {
+        passaro.setFlip(true, false);
+        passaro.ida = false;
+    }
+
+    if (passaro.ida) {
+        passaro.x += 5;
+    } else {
+        passaro.x -= 5;
+    }
+
+    // M vertical (cima <-> baixo) junto com o movimento horizontal
+    if (passaro.y <= 200) {
+        passaro.subindo = false; // bate no topo, começa a descer
+    }
+
+    if (passaro.y >= 400) {
+        passaro.subindo = true; // bate no fundo e começa a subir
+    }
+
+    if (passaro.subindo) {
+        passaro.y -= 3; // M cima
+    } else {
+        passaro.y += 3; // M baixo
+    }
+}
 
 
 
