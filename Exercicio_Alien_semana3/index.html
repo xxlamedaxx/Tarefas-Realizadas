@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exercício do Alien</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script>
+      const larguraJogo = 700;
+      const alturaJogo = 850;
+
+      const config = {
+        type: Phaser.AUTO,
+        width: larguraJogo,
+        height: alturaJogo,
+
+        // Ativando a física no jogo
+        physics: {
+          default: "arcade",
+          arcade: {
+            gravity: { y: 300 },
+            debug: true,
+          },
+        },
+
+        scene: {
+          preload: preload,
+          create: create,
+          update: update,
+        },
+      };
+
+      // o que acontece aqui?
+      const game = new Phaser.Game(config);
+
+      var alien,
+        teclado,
+        fogo,
+        plataforma,
+        moeda,
+        pontuacao = 0,
+        placar,
+        bloco;
+
+      function preload() {
+        this.load.image("background", "assets/bg.png");
+        this.load.image("player", "assets/alienigena.png");
+        this.load.image("turbo", "assets/turbo.png");
+        this.load.image("tijolo", "assets/tijolos.png");
+        this.load.image("moeda", "assets/moeda.png");
+        this.load.image("bloco", "assets/bloco.png");
+      }
+
+      function create() {
+        // o que acontece aqui?
+        this.add.image(larguraJogo / 2, alturaJogo / 2, "background");
+
+        //add foguete
+        fogo = this.add.sprite(0, 0, "turbo");
+        fogo.setVisible(false);
+
+        alien = this.physics.add.sprite(larguraJogo / 2, 0, "player");
+        alien.setCollideWorldBounds(true);
+        teclado = this.input.keyboard.createCursorKeys();
+
+        //add tijolo
+        plataforma = this.physics.add.staticImage(
+          larguraJogo / 2,
+          alturaJogo / 2,
+          "tijolo"
+        );
+        this.physics.add.collider(alien, plataforma);
+
+        //add bloco
+        bloco = this.physics.add.staticImage(
+          larguraJogo / 8,
+          alturaJogo / 3.5,
+          "bloco"
+        );
+        this.physics.add.collider(alien, bloco);
+
+        //add moeda
+        moeda = this.physics.add.sprite(larguraJogo / 2, 0, "moeda");
+        moeda.setCollideWorldBounds(true);
+        moeda.setBounce(0.7);
+        this.physics.add.collider(moeda, plataforma);
+        this.physics.add.collider(moeda, bloco);
+
+        // add placar
+        placar = this.add.text(50, 50, "moedas:" + pontuacao, {
+          frontSize: "45px",
+          fill: "#495613",
+        });
+
+        //alien encostar na moeda
+        this.physics.add.overlap(alien, moeda, function () {
+          moeda.setVisible(false);
+          var posicaoMoeda_Y = Phaser.Math.RND.between(50, 650);
+          moeda.setPosition(posicaoMoeda_Y, 100);
+          pontuacao += 1;
+          placar.setText("moedas:" + pontuacao);
+          placar.setScale(2.3);
+          moeda.setVisible(true);
+        });
+      }
+
+      function update() {
+        // Resetando a velocidade antes de aplicar novas direções
+        alien.setVelocityX(0);
+
+        // Controles de movimento
+        if (teclado.left.isDown) {
+          alien.setVelocityX(-150); // Move para a esquerda
+        } else if (teclado.right.isDown) {
+          alien.setVelocityX(150); // Move para a direita
+        } else {
+          alien.setVelocityX(0);
+        }
+        if (teclado.up.isDown) {
+          alien.setVelocityY(-150);
+          ativarTurbo();
+        } else {
+          semTurbo();
+        }
+
+        fogo.setPosition(alien.x, alien.y + alien.height / 2);
+
+        function ativarTurbo() {
+          fogo.setVisible(true);
+        }
+        function semTurbo() {
+          fogo.setVisible(false);
+        }
+      }
+    </script>
+  </body>
+</html>
