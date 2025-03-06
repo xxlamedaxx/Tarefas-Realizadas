@@ -9,7 +9,7 @@ const config = {
     default: "arcade",
     arcade: {
       gravity: { y: 0 }, // Sem gravidade para permitir movimentação livre
-      debug: false, // Ativar para ver os hitboxes dos objetos
+      debug: true, // Ativar para ver os hitboxes dos objetos
     },
   },
   scene: {
@@ -32,52 +32,73 @@ var player,
   chaoInvisivel,
   coroaImage,
   gameOverState = false;
+muro1;
 
 function preload() {
-  this.load.image("background", "assets/fundoo.png");
+  this.load.image("background", "assets/fundo.png");
   this.load.spritesheet("player", "assets/playerAnim.png", {
     frameWidth: 64,
     frameHeight: 64,
   });
   this.load.image("fantasma", "assets/player.png");
   this.load.image("coroa", "assets/coroa.png");
+  this.load.image("muro", "assets/muro.png");
 }
 
 function create() {
   // Adicionando fundo ao jogo
-  this.add.image(larguraJogo / 2, alturaJogo / 2, "background").setScale(2);
+
+  this.add.image(larguraJogo / 2, alturaJogo / 2, "background").setScale(4);
+
+  // Adicionando os muros
+  let muro1 = this.physics.add.staticGroup();
+
+  let m1 = muro1.create(310, 950, "muro");
+  m1.body.setSize(m1.width * 0.8, m1.height * 0.6); // Reduz hitbox para 50% do tamanho original
+
+  let m2 = muro1.create(1610, 950, "muro");
+  m2.body.setSize(m2.width * 0.8, m2.height * 0.6);
+
+  let m3 = muro1.create(950, 530, "muro");
+  m3.setScale(0.6);
+  m3.body.setSize(m3.width * 0.5, m3.height * 0.3);
+  m3.body.setOffset(
+    (m3.width - m3.body.width) / 2,
+    (m3.height - m3.body.height) / 2
+  );
 
   // Criando o jogador corretamente
   player = this.physics.add.sprite(400, 400, "player").setScale(3.8);
   player.setCollideWorldBounds(true);
+  this.physics.add.collider(player, muro1);
   player.body.setSize(player.width * 0.3, player.height * 0.3); // Diminuindo o tamanho do hitbox
 
   // Criando animações
   this.anims.create({
     key: "andar-baixo",
     frames: this.anims.generateFrameNumbers("player", { start: 0, end: 5 }),
-    frameRate: 10,
+    frameRate: 20,
     repeat: -1,
   });
 
   this.anims.create({
     key: "andar-esquerda",
     frames: this.anims.generateFrameNumbers("player", { start: 6, end: 11 }),
-    frameRate: 10,
+    frameRate: 20,
     repeat: -1,
   });
 
   this.anims.create({
     key: "andar-direita",
     frames: this.anims.generateFrameNumbers("player", { start: 12, end: 17 }),
-    frameRate: 10,
+    frameRate: 20,
     repeat: -1,
   });
 
   this.anims.create({
     key: "andar-cima",
     frames: this.anims.generateFrameNumbers("player", { start: 18, end: 23 }),
-    frameRate: 10,
+    frameRate: 20,
     repeat: -1,
   });
 
@@ -96,6 +117,7 @@ function create() {
     50,
     "fantasma"
   );
+  this.physics.add.collider(fantasma, m3);
 
   fantasma.setVelocityY(200);
   fantasma.body.setSize(fantasma.width * 0.5, fantasma.height * 0.5);
@@ -155,16 +177,16 @@ function update() {
   player.setVelocity(0);
 
   if (cursor.left.isDown || keys.A.isDown) {
-    player.setVelocityX(-660);
+    player.setVelocityX(-760);
     player.anims.play("andar-esquerda", true);
   } else if (cursor.right.isDown || keys.D.isDown) {
-    player.setVelocityX(660);
+    player.setVelocityX(760);
     player.anims.play("andar-direita", true);
   } else if (cursor.up.isDown || keys.W.isDown) {
-    player.setVelocityY(-660);
+    player.setVelocityY(-760);
     player.anims.play("andar-cima", true);
   } else if (cursor.down.isDown || keys.S.isDown) {
-    player.setVelocityY(660);
+    player.setVelocityY(760);
     player.anims.play("andar-baixo", true);
   } else {
     player.anims.stop();
